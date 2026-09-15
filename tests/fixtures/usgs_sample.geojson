@@ -1,0 +1,39 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "generated": 1726400000000,
+    "title": "USGS Earthquakes",
+    "status": 200,
+    "count": 2
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "uw12345678",
+      "properties": {
+        "mag": 2.7,
+        "place": "10 km WSW of Newberg, Oregon",
+        "time": 1726400000000,
+        "type": "earthquake"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-123.10, 45.28, 12.4]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "uw87654321",
+      "properties": {
+        "mag": 3.1,
+        "place": "5 km E of Klamath Falls, Oregon",
+        "time": 1726300000000,
+        "type": "earthquake"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-121.72, 42.22, 8.0]
+      }
+    }
+  ]
+}
