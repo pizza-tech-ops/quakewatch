@@ -1,12 +1,16 @@
+from datetime import datetime, timezone
 from pathlib import Path
 
-from quakewatch.store import connect, upsert_quakes
+from quakewatch.store import connect, list_quakes, upsert_quakes
 
 
-def _quake(event_id: str, mag: float = 2.7, place: str = "Newberg, Oregon"):
+def _quake(event_id: str,
+    mag: float = 2.7,
+    place: str = "Newberg, Oregon",
+    time_utc: str = "2024-09-15T11:33:20Z",):
     return {
         "id": event_id,
-        "time_utc": "2024-09-15T11:33:20Z",
+        "time_utc": time_utc,
         "lat": 45.28,
         "lon": -123.10,
         "mag": mag,
@@ -104,5 +108,67 @@ def test_upsert_skips_rows_without_id(tmp_path: Path):
         assert written == 1
         ids = [row["id"] for row in conn.execute("SELECT id FROM quakes")]
         assert ids == ["uw00000001"]
+    finally:
+        conn.close()
+
+        
+
+NOW = datetime(2024, 9, 16, 12, 0, 0, tzinfo=timezone.utc)
+
+
+def test_list_quakes_empty(tmp_path: Path):
+    conn = connect(tmp_path / "quakes.db")
+    try:
+        assert list_quakes(conn, now=NOW) == []
+    finally:
+        conn.close()
+
+
+def test_list_quakes_newest_first(tmp_path: Path):
+    conn = connect(tmp_path / "quakes.db")
+    try:
+        upsert_quakes(
+            conn,
+            [
+                _quake("oldish", mag=3.0, time_utc="2024-09-14T10:00:00Z"),
+                _quake("newest", mag=3.0, time_utc="2024-09-16T08:00:00Z"),
+                _quake("middle", mag=3.0, time_utc="2024-09-15T11:33:20Z"),
+            ],
+        )
+        rows = list_quakes(conn, min_mag=2.5, days=30, now=NOW)
+        assert [row["id"] for row in rows] == ["newest", "middle", "oldish"]
+    finally:
+        conn.close()
+
+
+def test_list_quakes_filters_min_mag(tmp_path: Path):
+    conn = connect(tmp_path / "quakes.db")
+    try:
+        upsert_quakes(
+            conn,
+            [
+                _quake("small", mag=2.1, time_utc="2024-09-16T08:00:00Z"),
+                _quake("big", mag=3.4, time_utc="2024-09-16T09:00:00Z"),
+            ],
+        )
+        rows = list_quakes(conn, min_mag=2.5, days=30, now=NOW)
+        assert [row["id"] for row in rows] == ["big"]
+        assert rows[0]["mag"] == 3.4
+    finally:
+        conn.close()
+
+
+def test_list_quakes_filters_days(tmp_path: Path):
+    conn = connect(tmp_path / "quakes.db")
+    try:
+        upsert_quakes(
+            conn,
+            [
+                _quake("fresh", mag=3.0, time_utc="2024-09-15T11:33:20Z"),
+                _quake("stale", mag=3.0, time_utc="2024-09-01T00:00:00Z"),
+            ],
+        )
+        rows = list_quakes(conn, min_mag=2.5, days=7, now=NOW)
+        assert [row["id"] for row in rows] == ["fresh"]
     finally:
         conn.close()

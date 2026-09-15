@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# QuakeWatch local SQLite (live fetch writes this; never commit)
+quakes.db

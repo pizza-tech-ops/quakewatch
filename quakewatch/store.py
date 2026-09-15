@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sqlite3
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -54,3 +55,27 @@ def upsert_quakes(
     conn.executemany(UPSERT_SQL, rows)
     conn.commit()
     return len(rows)
+
+
+
+def list_quakes(
+    conn: sqlite3.Connection,
+    *,
+    min_mag: float = 2.5,
+    days: int = 30,
+    now: datetime | None = None,
+) -> list[dict[str, Any]]:
+    if now is None:
+        now = datetime.now(timezone.utc)
+    cutoff = (now - timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    rows = conn.execute(
+        """
+        SELECT id, time_utc, lat, lon, mag, place, raw_json
+        FROM quakes
+        WHERE mag >= ?
+          AND time_utc >= ?
+        ORDER BY time_utc DESC
+        """,
+        (min_mag, cutoff),
+    ).fetchall()
+    return [dict(row) for row in rows]
