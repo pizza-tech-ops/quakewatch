@@ -6,7 +6,7 @@
 
 Oregon-box earthquake tool. Pulls USGS FDSN events into SQLite, lists them from a CLI, and serves the same rows from a thin FastAPI.
 
-v1 is a portfolio slice: fetch → store → list → API → Docker → CI. It does not forecast earthquakes.
+fetch → store → list → API → Docker → CI.
 
 ## What it does
 
