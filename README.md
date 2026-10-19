@@ -1,5 +1,12 @@
 
 ```markdown
+
+## Live demo
+https://quakewatch-4cwe.onrender.com
+- `/health` → status
+- `/quakes` → events (empty on free tier until seeded)
+- `/docs` → interactive API docs
+
 # QuakeWatch
 
 [![test](https://github.com/pizza-tech-ops/quakewatch/actions/workflows/test.yml/badge.svg)](https://github.com/pizza-tech-ops/quakewatch/actions/workflows/test.yml)
