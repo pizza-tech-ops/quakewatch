@@ -186,3 +186,5 @@ requirements.txt
 ## License
 
 MIT.
+
+# TODO: restrict allow_origins before any public deploy
