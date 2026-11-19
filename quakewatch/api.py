@@ -8,7 +8,15 @@ from fastapi import FastAPI
 from quakewatch.fetch import DEFAULT_DAYS, DEFAULT_MIN_MAG
 from quakewatch.store import connect, list_quakes
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def db_path() -> str:
